@@ -182,7 +182,7 @@ def main():
     features = compute_features(close, volume)
     benchmark_returns = benchmark_close.pct_change().fillna(0)
 
-    month_ends = close.resample("M").last().index
+    month_ends = close.resample("ME").last().index
 
     current_weights = pd.Series(0.0, index=close.columns)
     portfolio_daily_returns = []
