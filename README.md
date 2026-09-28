@@ -1,36 +1,36 @@
-# us-momentum-1
+# US Momentum Backtest
 
-Author: ptat
+A small personal project I built to test a fairly simple question: can a monthly momentum rule on liquid US large caps behave reasonably after adding a few risk filters and trading costs?
 
-This repo is a simple monthly momentum model for US large-cap stocks.
+The model is deliberately simple. I wanted something I could understand end to end before adding more complicated signals.
 
-What it does:
-- downloads price and volume data with yfinance
-- computes 3-month, 6-month, and 12-month momentum
-- uses MA200, volatility, drawdown, and dollar-volume filters
-- ranks names by momentum
-- builds a portfolio with inverse-volatility weights
+## Rules
+
+The current version:
+
+- downloads adjusted price and volume data with `yfinance`
+- calculates 3, 6 and 12 month momentum
+- filters out names below their 200 day moving average
+- removes very volatile names, deep recent drawdowns and illiquid stocks
+- ranks the remaining stocks by average momentum rank
+- holds the top 10
+- uses inverse 90 day volatility for position sizing, with a 20% cap per name
 - rebalances monthly
-- includes transaction cost in the backtest
-- compares performance with SPY
-- exports the latest target weights for Alpaca paper trading
+- charges 10 bps one way based on portfolio turnover
+- compares the result with SPY
 
-Files:
-- `main.py`: runs the backtest and saves outputs in `results/`
-- `paper_trade.py`: reads `results/weights_latest.csv` and sends paper orders to Alpaca
-- `run_all.bat`: runs the model and then runs the paper-trading rebalance
+The latest target weights can also be passed to a separate Alpaca paper-trading script. It only connects to a paper account.
 
-Outputs from `main.py`:
-- `results/daily_results.csv`
-- `results/monthly_weights.csv`
-- `results/weights_latest.csv`
-- `results/turnover.csv`
-- `results/summary.csv`
-- `results/equity_curve.png`
+## Files
 
-## Run locally
+- `main.py` - data download, signals, portfolio construction and backtest
+- `paper_trade.py` - simple Alpaca paper rebalance
+- `requirements.txt` - Python dependencies
+- `run_all.bat` - convenience script for Windows
 
-Open Command Prompt in this folder and run:
+The backtest writes its files to `results/`, including the daily equity curve, monthly weights, turnover and a summary table.
+
+## Run
 
 ```bat
 python -m venv .venv
@@ -39,9 +39,7 @@ pip install -r requirements.txt
 python main.py
 ```
 
-## Run Alpaca paper rebalance
-
-Before running `paper_trade.py`, set your paper keys in Command Prompt:
+For the paper rebalance, set the Alpaca paper keys in the shell and then run:
 
 ```bat
 set APCA_API_KEY_ID=YOUR_PAPER_KEY
@@ -49,6 +47,10 @@ set APCA_API_SECRET_KEY=YOUR_PAPER_SECRET
 python paper_trade.py
 ```
 
-## Notes
+## Things I would not treat as solved
 
-This is a small personal project for research and learning. It uses a fixed stock list and simple assumptions. In the future, I will try improving data quality, adding more realistic backtesting assumptions (slippage, execution lag, etc) and systematically testing new strategy variations.
+This is a research/learning backtest, not a production strategy.
+
+The stock universe is a fixed list of current large-cap names, so historical results have survivorship/selection bias. Data comes from yfinance, execution is simplified, and the cost model does not capture spread or market impact. The paper-trading script also sizes orders from the last saved model price rather than a full execution engine.
+
+Those are the main things I would fix before using the project for more serious research.
