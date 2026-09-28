@@ -1,18 +1,11 @@
 import os
-import math
 import pandas as pd
 import numpy as np
 import yfinance as yf
 import matplotlib.pyplot as plt
 
-# Simple momentum pipeline for US large-cap stocks
-# - fixed universe
-# - monthly rebalance
-# - liquidity filter
-# - MA200 / volatility / drawdown filters
-# - momentum 3m / 6m / 12m ranking
-# - inverse volatility weighting
-# - transaction cost by turnover
+# Monthly momentum backtest. I keep the assumptions near the top so it is easy
+# to rerun a slightly different version without touching the backtest logic.
 
 TICKERS = [
     "AAPL","MSFT","AMZN","GOOGL","META","NVDA","BRK-B","LLY","JPM","V",
